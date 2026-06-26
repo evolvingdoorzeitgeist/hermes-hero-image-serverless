@@ -1,3 +1,4 @@
+import os
 import base64
 import io
 import uuid
@@ -23,9 +24,15 @@ def get_pipe():
     global _pipe
 
     if _pipe is None:
+        hf_token = os.environ.get("HF_TOKEN")
+
+        if not hf_token:
+            raise ValueError("HF_TOKEN is missing. Add it to RunPod endpoint environment variables.")
+
         _pipe = FluxPipeline.from_pretrained(
             MODEL_ID,
             torch_dtype=torch.bfloat16,
+            token=hf_token,
         )
         _pipe.to("cuda")
 
